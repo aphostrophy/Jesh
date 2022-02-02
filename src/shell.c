@@ -18,6 +18,36 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/*
+    Function Declarations for builtin shell commands:
+*/
+int jesh_cd(char **args);
+int jesh_help(char **args);
+int jesh_exit(char **args);
+
+/*
+    List of builtin commands, followed by their corresponding functions.
+*/
+char *builtin_str[] = {
+    "cd",
+    "help",
+    "exit"
+};
+
+int (*builtin_func[]) (char **) = {
+    &jesh_cd,
+    &jesh_help,
+    &jesh_exit
+};
+
+int jesh_num_builtins() {
+    return sizeof(builtin_str) / sizeof(char *);
+}
+
+/*
+    Builtin function implementations
+*/
+
 #define JESH_RL_BUFSIZE 1024
 /**
  * @brief read_line, doesn't work with newline as it instantly terminates
