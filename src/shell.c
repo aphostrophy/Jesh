@@ -47,6 +47,34 @@ int jesh_num_builtins() {
 /*
     Builtin function implementations
 */
+int jesh_cd(char **args)
+{
+    if (args[1] == NULL) {
+        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+    } else{
+        if(chdir(args[1]) != 0){
+            perror("jesh");
+        }
+    }
+    return 1;
+}
+
+int jesh_help(char **args)
+{
+    int i;
+    printf("Jesson Yo's JESH\n");
+    printf("Jess Bash, version 0.0.1");
+    printf("These shell commands are defined internally. Type 'help' to see this list");
+
+    for (i=0; i < jesh_num_builtins(); i++){
+        printf("  %s\n", builtin_str[i]);
+    }
+}
+
+int jesh_exit(char **args)
+{
+    return 0;
+}
 
 #define JESH_RL_BUFSIZE 1024
 /**
@@ -87,11 +115,11 @@ char* jesh_read_line(void)
     }
 }
 
-#define LSH_TOK_BUFSIZE 64
-#define LSH_TOK_DELIM " \t\r\n\a"
+#define JESH_TOK_BUFSIZE 64
+#define JESH_TOK_DELIM " \t\r\n\a"
 char **jesh_split_line(char *line)
 {
-    int bufsize = LSH_TOK_BUFSIZE, position = 0;
+    int bufsize = JESH_TOK_BUFSIZE, position = 0;
     char **tokens = malloc(bufsize * sizeof(char*));
     char *token;
 
@@ -100,13 +128,13 @@ char **jesh_split_line(char *line)
         exit(EXIT_FAILURE);
     }
 
-    token = strtok(line, LSH_TOK_DELIM);
+    token = strtok(line, JESH_TOK_DELIM);
     while(token != NULL){
         tokens[position] = token;
         position++;
 
         if(position >= bufsize){
-            bufsize += LSH_TOK_BUFSIZE;
+            bufsize += JESH_TOK_BUFSIZE;
             tokens = realloc(tokens, bufsize * sizeof(char*));
             if(tokens == NULL){
                 fprintf(stderr, "lsh: allocation error\n");
@@ -114,7 +142,7 @@ char **jesh_split_line(char *line)
             }
         }
 
-        token = strtok(NULL, LSH_TOK_DELIM);
+        token = strtok(NULL, JESH_TOK_DELIM);
     }
     tokens[position] = NULL;
     return tokens;
