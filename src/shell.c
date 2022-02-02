@@ -171,6 +171,23 @@ int jesh_launch(char **args)
     return 1;
 }
 
+int jesh_execute(char **args)
+{
+    int i;
+
+    if (args[0] == NULL) {
+        return 1;
+    }
+
+    for (i = 0; i < jesh_num_builtins(); i++){
+        if (strcmp(args[0], builtin_str[i]) == 0){
+            return (*builtin_func[i])(args);
+        }
+    }
+
+    return jesh_launch(args);
+}
+
 void jesh_loop(void)
 {
     char *line;
@@ -181,7 +198,7 @@ void jesh_loop(void)
         printf("> ");
         line = jesh_read_line();
         args = jesh_split_line(line);
-        status = jesh_launch(args);
+        status = jesh_execute(args);
 
         free(line);
         free(args);
