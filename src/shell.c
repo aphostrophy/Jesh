@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -188,6 +189,16 @@ int jesh_execute(char **args)
     return jesh_launch(args);
 }
 
+void jesh_prompt(void)
+{
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("%s> ", cwd); 
+    } else{
+        perror("lsh");
+    }
+}
+
 void jesh_loop(void)
 {
     char *line;
@@ -195,7 +206,7 @@ void jesh_loop(void)
     int status;
 
     do{
-        printf("> ");
+        jesh_prompt();
         line = jesh_read_line();
         args = jesh_split_line(line);
         status = jesh_execute(args);
