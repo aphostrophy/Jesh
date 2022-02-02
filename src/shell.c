@@ -13,6 +13,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define JESH_RL_BUFSIZE 1024
 /**
@@ -86,6 +90,29 @@ char **jesh_split_line(char *line)
     return tokens;
 }
 
+int jesh_launch(char **args)
+{
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+    if (pid < 0){
+        perror("jesh");
+    } else if (pid == 0){
+        // execvp internally calls exit if it doesn't return a value
+        if (execvp(args[0], args) == -1){
+            perror("jesh");
+            exit(EXIT_FAILURE);
+        }
+    } else{
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+
+    return 1;
+}
+
 void jesh_loop(void)
 {
     char *line;
@@ -95,11 +122,11 @@ void jesh_loop(void)
     do{
         printf("> ");
         line = jesh_read_line();
-        // args = jesh_split_line(line);
-        // status = lsh_execute(args);
+        args = jesh_split_line(line);
+        status = jesh_launch(args);
 
         free(line);
-        // free(args);
+        free(args);
     } while(status);
 }
 
