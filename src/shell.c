@@ -51,7 +51,7 @@ int jesh_num_builtins() {
 int jesh_cd(char **args)
 {
     if (args[1] == NULL) {
-        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+        fprintf(stderr, "jesh: expected argument to \"cd\"\n");
     } else{
         if(chdir(args[1]) != 0){
             perror("jesh");
@@ -138,7 +138,7 @@ char **jesh_split_line(char *line)
             bufsize += JESH_TOK_BUFSIZE;
             tokens = realloc(tokens, bufsize * sizeof(char*));
             if(tokens == NULL){
-                fprintf(stderr, "lsh: allocation error\n");
+                fprintf(stderr, "jesh: allocation error\n");
                 exit(EXIT_FAILURE);
             }
         }
@@ -195,7 +195,7 @@ void jesh_prompt(void)
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         printf("%s> ", cwd); 
     } else{
-        perror("lsh");
+        perror("jesh");
     }
 }
 
